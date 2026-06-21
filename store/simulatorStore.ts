@@ -1,36 +1,36 @@
+'use client'
 import { create } from 'zustand'
-import { CarState, CarConfig } from '@/lib/physics/carPhysics'
+import { OCTAVIA_CONFIG } from '@/lib/physics/carPhysics'
+import type { CarConfig, CarInput, CarState } from '@/lib/physics/types'
 
-interface SimulatorStore {
+type SimulatorState = {
   car: CarState
+  input: CarInput
   config: CarConfig
-  setCar: (c: CarState) => void
-  reset: () => void
+  score: number
+  collisions: number
+  currentHint: string
+  setCar: (car: CarState) => void
+  setInput: (input: Partial<CarInput>) => void
+  setGear: (gear: 'D' | 'R') => void
+  resetCar: (car: CarState) => void
+  setHint: (hint: string) => void
+  addCollision: () => void
 }
 
-const defaultConfig: CarConfig = {
-  length: 4.698,
-  width: 1.829,
-  wheelBase: 2.686,
-  maxSteeringAngle: Math.PI / 6,
-  maxForwardSpeed: 3,
-  maxReverseSpeed: 2,
-  acceleration: 1.6,
-  brakePower: 3
-}
+const defaultCar: CarState = { x: -7, y: 0, angle: 0, speed: 0, steeringAngle: 0, gear: 'D' }
 
-const defaultCar: CarState = {
-  x: 0,
-  y: 0,
-  angle: 0,
-  speed: 0,
-  steeringAngle: 0,
-  gear: 'D'
-}
-
-export const useSimulatorStore = create<SimulatorStore>((set) => ({
+export const useSimulatorStore = create<SimulatorState>((set) => ({
   car: defaultCar,
-  config: defaultConfig,
+  input: { throttle: false, brake: false, steerLeft: false, steerRight: false },
+  config: OCTAVIA_CONFIG,
+  score: 100,
+  collisions: 0,
+  currentHint: 'Не спеши. Смотри на синюю траекторию.',
   setCar: (car) => set({ car }),
-  reset: () => set({ car: defaultCar })
+  setInput: (input) => set((s) => ({ input: { ...s.input, ...input } })),
+  setGear: (gear) => set((s) => ({ car: { ...s.car, gear, speed: 0 } })),
+  resetCar: (car) => set({ car, score: 100, collisions: 0, currentHint: 'Начнём спокойно. Ошибаться здесь можно.' }),
+  setHint: (currentHint) => set({ currentHint }),
+  addCollision: () => set((s) => ({ collisions: s.collisions + 1, score: Math.max(0, s.score - 12) }))
 }))
