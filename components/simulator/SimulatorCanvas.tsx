@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { updateCarPhysics, predictTrajectory } from '@/lib/physics/carPhysics'
 import { getCarCorners, getRectCorners } from '@/lib/physics/geometry'
 import { detectCollision, getSoftHint, isParked } from '@/lib/simulator/scoring'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useSimulatorStore } from '@/store/simulatorStore'
 import type { ParkingLevel } from '@/lib/data/levels'
-import type { CarInput, Point, TrajectoryPoint } from '@/lib/physics/types'
+import type { CarInput, Point } from '@/lib/physics/types'
 
 const SCALE = 38
 
@@ -53,7 +53,7 @@ function drawPath(ctx: CanvasRenderingContext2D, pts: Point[], w: number, h: num
 export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [finished, setFinished] = useState(false)
-  const { car, input, config, setCar, setInput, resetCar, setHint, addCollision } = useSimulatorStore()
+  const { setCar, setInput, resetCar, setHint, addCollision } = useSimulatorStore()
   const settings = useSettingsStore()
 
   useEffect(() => {
@@ -91,26 +91,35 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
     let collisionCooldown = 0
 
     const tick = (now: number) => {
-      const dt = Math.min(0.033, (now - last) / 1000)
+      const dtRaw = Math.min(0.033, (now - last) / 1000)
       last = now
       const state = useSimulatorStore.getState()
+      const dt = state.comfortMode ? dtRaw * 0.72 : dtRaw
+
       if (!finished) {
         const next = updateCarPhysics(state.car, state.input, state.config, dt)
         const hit = detectCollision(next, state.config, level.obstacles)
+
         if (hit && collisionCooldown <= 0) {
           addCollision()
           collisionCooldown = 0.8
-          setHint(hit.type === 'curb' ? 'Бордюр близко. Чуть выровняй траекторию.' : 'Касание. Ничего страшного — теперь видно, где габарит.')
+          setHint(hit.type === 'curb'
+            ? 'Бордюр близко. Ничего страшного — теперь видно, где траектория слишком близкая.'
+            : 'Касание. Посмотри на габаритный коридор: корпус машины не проходил безопасно.'
+          )
         } else {
           setHint(getSoftHint(next, level.target))
         }
+
         collisionCooldown -= dt
         setCar(hit ? { ...next, speed: 0 } : next)
+
         if (isParked(next, state.config, level.target)) {
           setFinished(true)
           setHint('Красиво получилось. Машина встала в зоне.')
         }
       }
+
       draw()
       raf = requestAnimationFrame(tick)
     }
@@ -122,12 +131,14 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
       const dpr = window.devicePixelRatio || 1
       const cssW = parent?.clientWidth || 900
       const cssH = parent?.clientHeight || 620
+
       if (canvas.width !== cssW * dpr || canvas.height !== cssH * dpr) {
         canvas.width = cssW * dpr
         canvas.height = cssH * dpr
         canvas.style.width = `${cssW}px`
         canvas.style.height = `${cssH}px`
       }
+
       const ctx = canvas.getContext('2d')
       if (!ctx) return
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -138,7 +149,6 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
       ctx.fillStyle = '#111827'
       ctx.fillRect(0, 0, w, h)
 
-      // asphalt grid
       ctx.strokeStyle = 'rgba(255,255,255,.055)'
       ctx.lineWidth = 1
       for (let x = (w/2) % 38; x < w; x += 38) {
@@ -178,20 +188,27 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
       }
 
       for (const obs of level.obstacles) {
-        const color = obs.type === 'car' ? 'rgba(148, 163, 184, .92)' : obs.type === 'curb' ? 'rgba(251, 191, 36, .82)' : 'rgba(251, 113, 133, .9)'
+        const color = obs.type === 'car' ? 'rgba(148, 163, 184, .92)' : obs.type === 'curb' ? 'rgba(251, 191, 36, .82)' : obs.type === 'trash' ? 'rgba(168,85,247,.75)' : 'rgba(251, 113, 133, .9)'
         drawPoly(ctx, getRectCorners(obs), w, h, color, 'rgba(255,255,255,.34)')
       }
 
-      // car
       const carPoly = getCarCorners(state.car, state.config)
       drawPoly(ctx, carPoly, w, h, 'rgba(139, 92, 246, .96)', 'rgba(255,255,255,.8)')
+
       const front = worldToScreen({ x: state.car.x + Math.cos(state.car.angle) * 2.15, y: state.car.y + Math.sin(state.car.angle) * 2.15 }, w, h)
       ctx.fillStyle = '#FF79B0'
       ctx.beginPath()
       ctx.arc(front.x, front.y, 5, 0, Math.PI * 2)
       ctx.fill()
 
-      // finish overlay
+      // steering indicator
+      ctx.fillStyle = 'rgba(255,255,255,.75)'
+      ctx.font = '12px system-ui'
+      ctx.textAlign = 'left'
+      ctx.fillText(`Руль: ${(state.car.steeringAngle * 180 / Math.PI).toFixed(0)}°`, 16, 24)
+      ctx.fillText(`Скорость: ${Math.abs(state.car.speed).toFixed(1)} м/с`, 16, 44)
+      ctx.fillText(`Передача: ${state.car.gear}`, 16, 64)
+
       if (finished) {
         ctx.fillStyle = 'rgba(0,0,0,.45)'
         ctx.fillRect(0, 0, w, h)
@@ -212,23 +229,51 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
   return <canvas ref={canvasRef} className="block h-full w-full rounded-3xl" />
 }
 
+function HoldButton({ children, onHold, onRelease, className = '' }: {
+  children: React.ReactNode
+  onHold: () => void
+  onRelease: () => void
+  className?: string
+}) {
+  return (
+    <button
+      onPointerDown={onHold}
+      onPointerUp={onRelease}
+      onPointerCancel={onRelease}
+      onPointerLeave={onRelease}
+      className={`select-none rounded-3xl border border-white/10 bg-white/10 px-4 py-5 text-sm font-semibold text-white shadow-card active:scale-[.98] ${className}`}
+    >
+      {children}
+    </button>
+  )
+}
+
 export function TouchControls() {
-  const { setInput, car, setGear, resetCar } = useSimulatorStore()
+  const { setInput, car, setGear, resetCar, comfortMode, setComfortMode } = useSimulatorStore()
   const press = (key: keyof CarInput, value: boolean) => () => setInput({ [key]: value } as Partial<CarInput>)
 
   return (
-    <div className="grid grid-cols-3 gap-3 md:hidden">
-      <div className="grid grid-cols-2 gap-2">
-        <button onPointerDown={press('steerLeft', true)} onPointerUp={press('steerLeft', false)} onPointerLeave={press('steerLeft', false)} className="rounded-2xl bg-white/10 py-5 text-xl">←</button>
-        <button onPointerDown={press('steerRight', true)} onPointerUp={press('steerRight', false)} onPointerLeave={press('steerRight', false)} className="rounded-2xl bg-white/10 py-5 text-xl">→</button>
+    <div className="space-y-3 md:hidden">
+      <div className="grid grid-cols-[1fr_1fr_1fr] gap-3">
+        <HoldButton onHold={press('steerLeft', true)} onRelease={press('steerLeft', false)} className="text-2xl">←</HoldButton>
+        <button onClick={() => setGear(car.gear === 'D' ? 'R' : 'D')} className="rounded-3xl border border-white/10 bg-violet/80 px-4 py-5 text-lg font-bold shadow-card active:scale-[.98]">
+          {car.gear}
+        </button>
+        <HoldButton onHold={press('steerRight', true)} onRelease={press('steerRight', false)} className="text-2xl">→</HoldButton>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <button onClick={() => setGear(car.gear === 'D' ? 'R' : 'D')} className="rounded-2xl bg-violet/80 py-5 font-bold">{car.gear}</button>
-        <button onClick={() => resetCar({ x: -7, y: 0, angle: 0, speed: 0, steeringAngle: 0, gear: 'D' })} className="rounded-2xl bg-white/10 py-5">R</button>
+
+      <div className="grid grid-cols-2 gap-3">
+        <HoldButton onHold={press('brake', true)} onRelease={press('brake', false)} className="bg-danger/65">Тормоз</HoldButton>
+        <HoldButton onHold={press('throttle', true)} onRelease={press('throttle', false)} className="bg-mint/65 text-ink">Газ</HoldButton>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <button onPointerDown={press('brake', true)} onPointerUp={press('brake', false)} onPointerLeave={press('brake', false)} className="rounded-2xl bg-danger/70 py-5">Тормоз</button>
-        <button onPointerDown={press('throttle', true)} onPointerUp={press('throttle', false)} onPointerLeave={press('throttle', false)} className="rounded-2xl bg-mint/70 py-5">Газ</button>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button onClick={() => setComfortMode(!comfortMode)} className="rounded-3xl border border-white/10 bg-white/10 px-4 py-4 text-sm text-soft">
+          {comfortMode ? 'Спокойный режим: вкл' : 'Спокойный режим: выкл'}
+        </button>
+        <button onClick={() => resetCar({ x: -7, y: 0, angle: 0, speed: 0, steeringAngle: 0, gear: 'D' })} className="rounded-3xl border border-white/10 bg-white/10 px-4 py-4 text-sm text-soft">
+          Сброс
+        </button>
       </div>
     </div>
   )

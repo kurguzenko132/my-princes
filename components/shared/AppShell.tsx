@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import { Car, Gauge, Home, Settings, Trophy } from 'lucide-react'
+import { BookOpen, Car, Gauge, Home, Settings, Trophy } from 'lucide-react'
 
 const nav = [
   { href: '/dashboard', label: 'Главная', icon: Home },
+  { href: '/learn', label: 'Теория', icon: BookOpen },
   { href: '/practice', label: 'Практика', icon: Car },
   { href: '/progress', label: 'Прогресс', icon: Gauge },
-  { href: '/achievements', label: 'Достижения', icon: Trophy },
+  { href: '/achievements', label: 'Награды', icon: Trophy },
   { href: '/settings', label: 'Настройки', icon: Settings }
 ]
 
@@ -34,12 +35,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <section className="flex-1 pb-24 md:pb-0">
           {children}
         </section>
-        <nav className="fixed inset-x-3 bottom-3 z-50 grid grid-cols-5 rounded-3xl border border-white/10 bg-[#10131F]/90 p-2 backdrop-blur-xl md:hidden">
+        <nav className="fixed inset-x-2 bottom-3 z-50 grid grid-cols-6 rounded-3xl border border-white/10 bg-[#10131F]/90 p-1.5 backdrop-blur-xl md:hidden">
           {nav.map(item => {
             const Icon = item.icon
             return (
-              <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 rounded-2xl px-2 py-2 text-[10px] text-soft">
-                <Icon size={18} />
+              <Link key={item.href} href={item.href} className="flex flex-col items-center gap-1 rounded-2xl px-1 py-2 text-[9px] text-soft">
+                <Icon size={17} />
                 {item.label}
               </Link>
             )

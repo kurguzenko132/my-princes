@@ -2,41 +2,64 @@
 
 import { useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Button } from '@/components/shared/Button'
-import { ArrowRight, Car, Heart, Sparkles } from 'lucide-react'
+import { ArrowRight, Car, Heart, Sparkles, Route, ShieldCheck, Gauge, Gift } from 'lucide-react'
 
 const introSteps = [
   {
     eyebrow: 'Только для тебя',
     title: 'Привет, Вика 💛',
-    text: 'Я сделал для тебя кое-что маленькое, личное и очень полезное.',
-    note: 'Пока без правил, упражнений и сложных слов. Просто начнём с приятного.',
+    text: 'Я сделал для тебя кое-что личное. Не просто страницу, а маленькое место, где можно спокойно учиться парковаться.',
+    note: 'Сначала здесь будет немного приятного. А потом — настоящий тренажёр.',
     button: 'Дальше',
     icon: Heart
   },
   {
-    eyebrow: 'Без давления',
-    title: 'Здесь можно ошибаться',
-    text: 'Можно задеть конус, начать заново, повторить манёвр и спокойно разобраться, почему машина поехала именно так.',
-    note: 'Никто не торопит. Никто не ругает. Тут можно тренироваться спокойно.',
+    eyebrow: 'Маленький подарок',
+    title: 'Это приложение сделано специально для тебя',
+    text: 'Чтобы парковка не казалась чем-то нервным и непонятным. Чтобы можно было потренироваться без спешки и без чужих комментариев.',
+    note: 'Ошибаться здесь можно сколько угодно. Для этого приложение и сделано.',
     button: 'Дальше',
-    icon: Sparkles
+    icon: Gift
+  },
+  {
+    eyebrow: 'Без давления',
+    title: 'Здесь не нужно быть идеальной с первого раза',
+    text: 'Можно задеть конус, начать заново, включить подсказки, посмотреть траекторию и спокойно повторить манёвр.',
+    note: 'В приложении ошибка — это не провал, а подсказка: где машина пошла не туда.',
+    button: 'Дальше',
+    icon: ShieldCheck
   },
   {
     eyebrow: 'Главная мысль',
     title: 'Парковка — это не талант',
-    text: 'Это траектория, габариты и немного практики. Если видеть, куда реально поедет машина, всё становится понятнее.',
-    note: 'Я хочу, чтобы тебе было спокойнее и увереннее за рулём.',
-    button: 'Показать, что внутри',
+    text: 'Это траектория, габариты, скорость и понимание того, когда повернуть руль. Если видеть путь машины сверху, всё становится намного понятнее.',
+    note: 'Именно поэтому здесь есть точная синяя траектория, а не просто красивая стрелка.',
+    button: 'Дальше',
+    icon: Route
+  },
+  {
+    eyebrow: 'Твоя машина',
+    title: 'Тренируемся на габаритах Skoda Octavia',
+    text: 'Машина в симуляторе длиннее маленького хэтчбека, поэтому важно чувствовать передний и задний свес, радиус поворота и движение задом.',
+    note: 'Цель — не игра ради игры, а привычка видеть габариты заранее.',
+    button: 'Дальше',
     icon: Car
+  },
+  {
+    eyebrow: 'Как будет проходить обучение',
+    title: 'Сначала теория, потом спокойная практика',
+    text: 'Короткие уроки объяснят, почему машина срезает угол, как работает задний ход, зачем нужен габаритный коридор и как выбирать момент поворота.',
+    note: 'После каждого урока будет упражнение, которое закрепляет именно этот навык.',
+    button: 'Дальше',
+    icon: Gauge
   },
   {
     eyebrow: 'Vika Parking',
     title: 'Это твой личный тренажёр парковки 🚗',
-    text: 'С видом сверху, Skoda Octavia по габаритам, точной синей траекторией, машиной-призраком, подсказками и реальными ситуациями.',
-    note: 'Сначала поймём движение машины. Потом — парковка передом, задом, параллельная и выезд из тесных мест.',
+    text: 'С видом сверху, точной траекторией, машиной-призраком, упражнениями, мягкими подсказками, звуками и реальными ситуациями: магазин, двор, бордюр, тесное место.',
+    note: 'Начнём спокойно. Без спешки. Просто шаг за шагом.',
     button: 'Начать обучение',
-    icon: Car
+    icon: Sparkles
   }
 ]
 
@@ -45,7 +68,6 @@ export default function IntroPage() {
   const current = introSteps[step]
   const Icon = current.icon
   const isLast = step === introSteps.length - 1
-
   const progress = useMemo(() => ((step + 1) / introSteps.length) * 100, [step])
 
   const next = () => {
@@ -70,7 +92,7 @@ export default function IntroPage() {
         <header className="flex items-center justify-between py-3">
           <div>
             <p className="text-sm font-semibold text-white">Vika Parking</p>
-            <p className="text-xs text-soft">личное приложение</p>
+            <p className="text-xs text-soft">личное приложение для Вики</p>
           </div>
 
           <div className="hidden items-center gap-2 sm:flex">
@@ -87,7 +109,7 @@ export default function IntroPage() {
           </div>
         </header>
 
-        <section className="grid flex-1 items-center gap-8 py-8 lg:grid-cols-[1.02fr_.98fr]">
+        <section className="grid flex-1 items-center gap-8 py-8 lg:grid-cols-[1.04fr_.96fr]">
           <div className="order-2 lg:order-1">
             <div className="glass relative overflow-hidden rounded-[2rem] p-6 sm:p-8 md:p-10">
               <div className="absolute inset-x-0 top-0 h-1 bg-white/10">
@@ -154,18 +176,18 @@ export default function IntroPage() {
 
                 <motion.div
                   className="absolute left-[18%] top-[31%] h-[16%] w-[46%] rounded-[1.4rem] border border-white/30 bg-slate-400/80 shadow-card"
-                  animate={{ x: step * 14, y: step * 6, rotate: step === 3 ? -8 : 0 }}
+                  animate={{ x: step * 8, y: step * 4, rotate: step > 3 ? -7 : 0 }}
                   transition={{ duration: 0.6, ease: 'easeInOut' }}
                 />
                 <motion.div
                   className="absolute right-[12%] top-[56%] h-[16%] w-[46%] rounded-[1.4rem] border border-white/30 bg-slate-500/70 shadow-card"
-                  animate={{ x: step * -8, y: step * -2, rotate: step === 2 ? 5 : 0 }}
+                  animate={{ x: step * -5, y: step * -2, rotate: step > 4 ? 5 : 0 }}
                   transition={{ duration: 0.6, ease: 'easeInOut' }}
                 />
 
                 <motion.div
                   className="absolute left-[20%] top-[47%] h-[15%] w-[42%] rounded-[1.2rem] border border-white/60 bg-violet shadow-glow"
-                  animate={{ x: step * 22, y: step === 0 ? 0 : step * -8, rotate: step === 0 ? 0 : step === 1 ? -8 : step === 2 ? 12 : 0 }}
+                  animate={{ x: step * 11, y: step === 0 ? 0 : step * -4, rotate: step < 2 ? 0 : step < 5 ? 10 : -4 }}
                   transition={{ duration: 0.7, ease: 'easeInOut' }}
                 >
                   <div className="absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-pink" />
@@ -180,7 +202,7 @@ export default function IntroPage() {
                     strokeLinecap="round"
                     strokeDasharray="12 12"
                     initial={{ pathLength: 0, opacity: 0.2 }}
-                    animate={{ pathLength: step >= 1 ? 1 : 0.45, opacity: step >= 1 ? 1 : 0.45 }}
+                    animate={{ pathLength: step >= 2 ? 1 : 0.45, opacity: step >= 2 ? 1 : 0.45 }}
                     transition={{ duration: 0.8 }}
                   />
                   <motion.path
@@ -190,7 +212,7 @@ export default function IntroPage() {
                     strokeLinecap="round"
                     strokeDasharray="8 10"
                     initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: step >= 2 ? 1 : 0, opacity: step >= 2 ? 1 : 0 }}
+                    animate={{ pathLength: step >= 3 ? 1 : 0, opacity: step >= 3 ? 1 : 0 }}
                     transition={{ duration: 0.8 }}
                   />
                 </svg>
@@ -198,9 +220,12 @@ export default function IntroPage() {
                 <div className="absolute bottom-5 left-5 right-5 rounded-3xl border border-white/10 bg-black/25 p-4 backdrop-blur">
                   <p className="text-xs text-soft">
                     {step === 0 && 'Сначала — просто приятное начало.'}
-                    {step === 1 && 'Ошибки здесь безопасны.'}
-                    {step === 2 && 'Траектория показывает, куда машина реально поедет.'}
-                    {step === 3 && 'А дальше — полноценная практика парковки.'}
+                    {step === 1 && 'Это не публичный сервис, а личная штука для тебя.'}
+                    {step === 2 && 'Ошибки здесь безопасны.'}
+                    {step === 3 && 'Траектория — главный ключ к парковке.'}
+                    {step === 4 && 'Octavia требует чувствовать длину машины.'}
+                    {step === 5 && 'Теория короткая, практика спокойная.'}
+                    {step === 6 && 'А теперь можно открыть сам тренажёр.'}
                   </p>
                 </div>
               </div>

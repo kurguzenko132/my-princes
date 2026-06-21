@@ -9,13 +9,17 @@ type SimulatorState = {
   config: CarConfig
   score: number
   collisions: number
+  maneuvers: number
   currentHint: string
+  comfortMode: boolean
   setCar: (car: CarState) => void
   setInput: (input: Partial<CarInput>) => void
   setGear: (gear: 'D' | 'R') => void
   resetCar: (car: CarState) => void
   setHint: (hint: string) => void
   addCollision: () => void
+  addManeuver: () => void
+  setComfortMode: (value: boolean) => void
 }
 
 const defaultCar: CarState = { x: -7, y: 0, angle: 0, speed: 0, steeringAngle: 0, gear: 'D' }
@@ -26,11 +30,15 @@ export const useSimulatorStore = create<SimulatorState>((set) => ({
   config: OCTAVIA_CONFIG,
   score: 100,
   collisions: 0,
+  maneuvers: 0,
   currentHint: 'Не спеши. Смотри на синюю траекторию.',
+  comfortMode: true,
   setCar: (car) => set({ car }),
   setInput: (input) => set((s) => ({ input: { ...s.input, ...input } })),
-  setGear: (gear) => set((s) => ({ car: { ...s.car, gear, speed: 0 } })),
-  resetCar: (car) => set({ car, score: 100, collisions: 0, currentHint: 'Начнём спокойно. Ошибаться здесь можно.' }),
+  setGear: (gear) => set((s) => ({ car: { ...s.car, gear, speed: 0 }, maneuvers: s.maneuvers + 1 })),
+  resetCar: (car) => set({ car, score: 100, collisions: 0, maneuvers: 0, currentHint: 'Начнём спокойно. Ошибаться здесь можно.' }),
   setHint: (currentHint) => set({ currentHint }),
-  addCollision: () => set((s) => ({ collisions: s.collisions + 1, score: Math.max(0, s.score - 12) }))
+  addCollision: () => set((s) => ({ collisions: s.collisions + 1, score: Math.max(0, s.score - 12) })),
+  addManeuver: () => set((s) => ({ maneuvers: s.maneuvers + 1 })),
+  setComfortMode: (comfortMode) => set({ comfortMode })
 }))
