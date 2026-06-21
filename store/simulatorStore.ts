@@ -4,7 +4,7 @@ import { CarState, CarConfig } from '@/lib/physics/carPhysics'
 interface SimulatorStore {
   car: CarState
   config: CarConfig
-  setCar: (car: CarState) => void
+  setCar: (c: CarState) => void
   reset: () => void
 }
 
@@ -13,10 +13,10 @@ const defaultConfig: CarConfig = {
   width: 1.829,
   wheelBase: 2.686,
   maxSteeringAngle: Math.PI / 6,
-  maxForwardSpeed: 3.0,
-  maxReverseSpeed: 2.0,
-  acceleration: 1.5,
-  brakePower: 3.0
+  maxForwardSpeed: 3,
+  maxReverseSpeed: 2,
+  acceleration: 1.6,
+  brakePower: 3
 }
 
 const defaultCar: CarState = {
@@ -25,7 +25,7 @@ const defaultCar: CarState = {
   angle: 0,
   speed: 0,
   steeringAngle: 0,
-  gear: 'R'
+  gear: 'D'
 }
 
 export const useSimulatorStore = create<SimulatorStore>((set) => ({

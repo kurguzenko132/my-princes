@@ -6,7 +6,7 @@ import { updateCarPhysics } from '@/lib/physics/carPhysics'
 
 export default function SimulatorCanvas() {
   const ref = useRef<HTMLDivElement>(null)
-  const { car, setCar, config } = useSimulatorStore()
+  const { car, config, setCar } = useSimulatorStore()
 
   useEffect(() => {
     if (!ref.current) return
@@ -18,11 +18,10 @@ export default function SimulatorCanvas() {
     })
     ref.current.appendChild(app.view as unknown as Node)
 
-    // draw car
     const carGfx = new Graphics()
-    carGfx.beginFill(0x8b5cf6)
-    carGfx.drawRect(-config.length * 10 /2, -config.width*10/2, config.length*10, config.width*10)
-    carGfx.endFill()
+      .beginFill(0x8b5cf6)
+      .drawRect(-config.length * 10 / 2, -config.width * 10 / 2, config.length * 10, config.width * 10)
+      .endFill()
     app.stage.addChild(carGfx)
 
     let last = performance.now()
@@ -47,11 +46,10 @@ export default function SimulatorCanvas() {
       const now = performance.now()
       const dt = (now - last) / 1000
       last = now
-
-      const next = updateCarPhysics(car, input, config, dt)
+      const next = updateCarPhysics(useSimulatorStore.getState().car, input, config, dt)
       setCar(next)
-      carGfx.position.set(next.x * 10 + 400, 300 - next.y * 10)
       carGfx.rotation = next.angle
+      carGfx.position.set(next.x * 10 + 400, 300 - next.y * 10)
     })
 
     return () => {
@@ -59,7 +57,7 @@ export default function SimulatorCanvas() {
       window.removeEventListener('keyup', keyUp)
       app.destroy(true, { children: true })
     }
-  }, [ref])
+  }, [])
 
-  return <div ref={ref} className="w-full h-full flex-1" />
+  return <div ref={ref} className="w-full h-full" />
 }
