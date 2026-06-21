@@ -6,6 +6,7 @@ import type { ParkingLevel } from '@/lib/data/levels'
 import { useSimulatorStore } from '@/store/simulatorStore'
 import { FinishAttemptButton } from '@/components/simulator/FinishAttemptButton'
 import { playSound } from '@/lib/sound/soundEngine'
+import { PremiumLayeredCanvas } from '@/components/simulator/PremiumLayeredCanvas'
 import type { CarInput } from '@/lib/physics/types'
 
 function HoldButton({ children, onHold, onRelease, className = '' }: {
@@ -81,18 +82,15 @@ export function PremiumGameplayClient({ level }: { level: ParkingLevel }) {
         </div>
 
         <section className="relative mt-6 h-[900px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#070a12] shadow-card md:h-[940px]">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: "url('/assets/v11/scene-shop-reverse-night.png')" }}
-          />
-          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080B13]/45 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#080B13]/70 to-transparent" />
-          <div className="v11-glass absolute left-5 top-8 max-w-[260px] rounded-[1.5rem] p-5">
+          <PremiumLayeredCanvas level={level} />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#080B13]/35 to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#080B13]/50 to-transparent" />
+          <div className="v11-glass absolute left-5 top-8 max-w-[270px] rounded-[1.5rem] p-5">
             <div className="flex gap-4">
               <span className="text-3xl text-pink">☼</span>
               <div>
                 <p className="text-xl font-semibold">Подсказка:</p>
-                <p className="mt-2 text-lg leading-7 text-soft">выравнивай руль чуть раньше.</p>
+                <p className="mt-2 text-lg leading-7 text-soft">смотри на синюю траекторию и выравнивай руль чуть раньше.</p>
               </div>
             </div>
           </div>

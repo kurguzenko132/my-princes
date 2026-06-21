@@ -1,0 +1,16 @@
+<svg width="520" height="240" viewBox="0 0 520 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <filter id="shadow" x="-30%" y="-50%" width="160%" height="200%">
+    <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity=".52"/>
+  </filter>
+  <g filter="url(#shadow)">
+    <rect x="24" y="24" width="472" height="192" rx="45" fill="#4B5563" stroke="rgba(255,255,255,.25)" stroke-width="3"/>
+    <path d="M98 42 H344 C418 42 474 74 488 120 C474 166 418 198 344 198 H98 C54 194 34 158 34 120 C34 82 54 46 98 42Z" fill="#64748B"/>
+    <rect x="210" y="54" width="138" height="132" rx="26" fill="#0F172A"/>
+    <rect x="226" y="72" width="48" height="96" rx="14" fill="#1E314B"/>
+    <rect x="288" y="72" width="44" height="96" rx="14" fill="#1E314B"/>
+    <rect x="493" y="80" width="8" height="35" rx="4" fill="#7DBDFF"/>
+    <rect x="493" y="128" width="8" height="35" rx="4" fill="#7DBDFF"/>
+    <rect x="18" y="78" width="8" height="38" rx="4" fill="#C33B56"/>
+    <rect x="18" y="126" width="8" height="38" rx="4" fill="#C33B56"/>
+  </g>
+</svg>
