@@ -17,6 +17,7 @@ type SimulatorState = {
   setCar: (car: CarState) => void
   setInput: (input: Partial<CarInput>) => void
   setGear: (gear: 'D' | 'R') => void
+  setVirtualSteering: (value: number | null) => void
   resetCar: (car: CarState) => void
   setHint: (hint: string) => void
   addCollision: () => void
@@ -28,7 +29,7 @@ const defaultCar: CarState = { x: -7, y: 0, angle: 0, speed: 0, steeringAngle: 0
 
 export const useSimulatorStore = create<SimulatorState>((set) => ({
   car: defaultCar,
-  input: { throttle: false, brake: false, steerLeft: false, steerRight: false },
+  input: { throttle: false, brake: false, steerLeft: false, steerRight: false, virtualSteering: null },
   config: OCTAVIA_CONFIG,
   score: 100,
   collisions: 0,
@@ -40,6 +41,7 @@ export const useSimulatorStore = create<SimulatorState>((set) => ({
   setCar: (car) => set((s) => ({ car, maxSpeed: Math.max(s.maxSpeed, Math.abs(car.speed)) })),
   setInput: (input) => set((s) => ({ input: { ...s.input, ...input } })),
   setGear: (gear) => set((s) => ({ car: { ...s.car, gear, speed: 0 }, maneuvers: s.maneuvers + 1 })),
+  setVirtualSteering: (value) => set((s) => ({ input: { ...s.input, virtualSteering: value } })),
   resetCar: (car) => set({
     car,
     score: 100,

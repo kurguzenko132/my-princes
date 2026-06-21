@@ -7,15 +7,17 @@ import { detectCollision, getSoftHint, isParked } from '@/lib/simulator/scoring'
 import { buildAttemptResult } from '@/lib/simulator/result'
 import { saveAttempt } from '@/lib/progress/storage'
 import { sceneTheme, getSceneLabel } from '@/lib/simulator/visualTheme'
+import { playSound } from '@/lib/sound/soundEngine'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useSimulatorStore } from '@/store/simulatorStore'
 import type { ParkingLevel } from '@/lib/data/levels'
 import type { CarConfig, CarInput, CarState, Point, RectObstacle, TargetZone } from '@/lib/physics/types'
 
 const SCALE = 40
+let activeCamera: Point = { x: 0, y: 0 }
 
 function worldToScreen(p: Point, w: number, h: number) {
-  return { x: w / 2 + p.x * SCALE, y: h / 2 - p.y * SCALE }
+  return { x: w / 2 + (p.x - activeCamera.x) * SCALE, y: h / 2 - (p.y - activeCamera.y) * SCALE }
 }
 
 function drawPath(ctx: CanvasRenderingContext2D, pts: Point[], w: number, h: number, color: string, width = 3, dash?: number[]) {
@@ -342,6 +344,34 @@ function drawOctavia(ctx: CanvasRenderingContext2D, car: CarState, cfg: CarConfi
   ctx.restore()
 }
 
+
+function drawInstructorCheckpoints(ctx: CanvasRenderingContext2D, level: ParkingLevel, w: number, h: number) {
+  if (!level.ideal || level.ideal.length === 0) return
+
+  ctx.save()
+  level.ideal.forEach((point, index) => {
+    if (index === 0) return
+    const p = worldToScreen(point, w, h)
+    ctx.fillStyle = 'rgba(255, 91, 200, .16)'
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, 15, 0, Math.PI * 2)
+    ctx.fill()
+
+    ctx.strokeStyle = 'rgba(255, 91, 200, .65)'
+    ctx.lineWidth = 1.5
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, 15, 0, Math.PI * 2)
+    ctx.stroke()
+
+    ctx.fillStyle = '#FF5BC8'
+    ctx.font = '700 11px system-ui'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(String(index), p.x, p.y)
+  })
+  ctx.restore()
+}
+
 function drawTrajectoryRisk(ctx: CanvasRenderingContext2D, level: ParkingLevel, predicted: { x: number; y: number; angle: number }[], cfg: CarConfig, w: number, h: number) {
   // lightweight visual risk: mark future ghost positions that intersect obstacles
   for (let i = 0; i < predicted.length; i += 10) {
@@ -364,6 +394,7 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [finished, setFinished] = useState(false)
   const savedRef = useRef(false)
+  const cameraRef = useRef<Point>({ x: level.start.x, y: level.start.y })
   const { setCar, setInput, resetCar, setHint, addCollision } = useSimulatorStore()
   const settings = useSettingsStore()
 
@@ -371,6 +402,7 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
     resetCar(level.start)
     setFinished(false)
     savedRef.current = false
+    cameraRef.current = { x: level.start.x, y: level.start.y }
   }, [level.id, resetCar, level.start])
 
   useEffect(() => {
@@ -414,6 +446,7 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
 
         if (hit && collisionCooldown <= 0) {
           addCollision()
+          playSound('warning')
           collisionCooldown = 0.8
           setHint(hit.type === 'curb'
             ? 'Бордюр близко. Ничего страшного — теперь видно, где траектория слишком близкая.'
@@ -439,6 +472,7 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
             completed: true
           })
           saveAttempt(result)
+          playSound('success')
           setFinished(true)
           setHint('Красиво получилось. Машина встала в зоне.')
           setTimeout(() => {
@@ -472,11 +506,21 @@ export function SimulatorCanvas({ level }: { level: ParkingLevel }) {
       const w = cssW
       const h = cssH
 
+      const stateForCamera = useSimulatorStore.getState()
+      cameraRef.current = {
+        x: cameraRef.current.x + (stateForCamera.car.x - cameraRef.current.x) * 0.055,
+        y: cameraRef.current.y + (stateForCamera.car.y - cameraRef.current.y) * 0.055
+      }
+      activeCamera = cameraRef.current
+
       drawAsphalt(ctx, w, h, level)
       drawSceneDecor(ctx, w, h, level)
       drawParkingSlot(ctx, level.target, w, h)
 
-      if (settings.ideal) drawPath(ctx, level.ideal, w, h, 'rgba(52,211,153,.92)', 4, [10, 10])
+      if (settings.ideal) {
+        drawPath(ctx, level.ideal, w, h, 'rgba(52,211,153,.92)', 4, [10, 10])
+        drawInstructorCheckpoints(ctx, level, w, h)
+      }
 
       const state = useSimulatorStore.getState()
       const predicted = predictTrajectory(state.car, state.input, state.config, 2.8, 34)

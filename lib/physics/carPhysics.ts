@@ -26,14 +26,18 @@ export function updateCarPhysics(state: CarState, input: CarInput, cfg: CarConfi
   let steering = state.steeringAngle
   const steerRate = cfg.maxSteeringAngle * 2.15
 
-  if (input.steerLeft) steering += steerRate * dt
-  if (input.steerRight) steering -= steerRate * dt
-  if (!input.steerLeft && !input.steerRight) {
-    const ret = cfg.steeringReturn * dt
-    if (Math.abs(steering) <= ret) steering = 0
-    else steering -= Math.sign(steering) * ret
+  if (typeof input.virtualSteering === 'number') {
+    steering = clamp(input.virtualSteering, -1, 1) * cfg.maxSteeringAngle
+  } else {
+    if (input.steerLeft) steering += steerRate * dt
+    if (input.steerRight) steering -= steerRate * dt
+    if (!input.steerLeft && !input.steerRight) {
+      const ret = cfg.steeringReturn * dt
+      if (Math.abs(steering) <= ret) steering = 0
+      else steering -= Math.sign(steering) * ret
+    }
+    steering = clamp(steering, -cfg.maxSteeringAngle, cfg.maxSteeringAngle)
   }
-  steering = clamp(steering, -cfg.maxSteeringAngle, cfg.maxSteeringAngle)
 
   let speed = state.speed
   if (input.throttle) {

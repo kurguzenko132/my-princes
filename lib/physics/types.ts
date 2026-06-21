@@ -16,6 +16,12 @@ export type CarInput = {
   brake: boolean
   steerLeft: boolean
   steerRight: boolean
+  /**
+   * -1..1 from the virtual wheel.
+   * Positive means steering left, negative means steering right.
+   * null/undefined means keyboard/button steering is used.
+   */
+  virtualSteering?: number | null
 }
 
 export type CarConfig = {
