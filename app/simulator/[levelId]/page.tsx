@@ -1,9 +1,11 @@
-import { AppShell } from '@/components/shared/AppShell'
-import { Card } from '@/components/shared/Card'
 import { getLevel, levels } from '@/lib/data/levels'
-import { SimulatorCanvas, TouchControls } from '@/components/simulator/SimulatorCanvas'
-import { SimulatorHud } from '@/components/simulator/SimulatorHud'
-import { FinishAttemptButton } from '@/components/simulator/FinishAttemptButton'
+import { SimulatorCanvas } from '@/components/simulator/SimulatorCanvas'
+import { GameTopBar, GameStats } from '@/components/simulator/GameTopBar'
+import { TrainingStepper } from '@/components/simulator/TrainingStepper'
+import { GameHintCard } from '@/components/simulator/GameHintCard'
+import { GameControlDock } from '@/components/simulator/GameControlDock'
+import { GameMotivation } from '@/components/simulator/GameMotivation'
+import { AuthGuard } from '@/components/auth/AuthGuard'
 
 type SimulatorPageProps = {
   params: Promise<{
@@ -22,55 +24,22 @@ export default async function SimulatorPage({ params }: SimulatorPageProps) {
   const level = getLevel(levelId)
 
   return (
-    <AppShell>
-      <div className="space-y-4">
-        <Card className="p-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm text-sky">Уровень · сложность {level.difficulty}/5 · навык: {level.skill}</p>
-              <h1 className="text-2xl font-semibold">{level.title}</h1>
-              <p className="mt-1 text-sm text-soft">{level.goal}</p>
-            </div>
-            <SimulatorHud />
-          </div>
-        </Card>
+    <main className="game-shell min-h-screen px-3 py-4 text-white md:px-8 md:py-7">
+      <AuthGuard>
+        <div className="mx-auto flex min-h-[calc(100vh-32px)] max-w-[1180px] flex-col gap-4">
+          <GameTopBar title={level.title} skill={level.skill} difficulty={level.difficulty} />
+          <GameStats />
+          <TrainingStepper />
 
-        <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
-          <div className="h-[58vh] min-h-[420px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#111827] md:h-[70vh]">
+          <section className="relative min-h-[420px] flex-1 overflow-hidden rounded-[2.2rem] border border-white/10 bg-[#101827] shadow-card md:min-h-[580px]">
+            <GameHintCard />
             <SimulatorCanvas level={level} />
-          </div>
+          </section>
 
-          <div className="space-y-4">
-            <Card className="p-4">
-              <h3 className="font-semibold">Подсказки уровня</h3>
-              <ul className="mt-3 space-y-2 text-sm text-soft">
-                {level.tips.map((tip) => <li key={tip}>— {tip}</li>)}
-              </ul>
-            </Card>
-
-            <Card className="p-4">
-              <h3 className="font-semibold">Что значит линия</h3>
-              <div className="mt-3 space-y-2 text-sm text-soft">
-                <p><span className="text-sky">Синяя</span> — куда машина реально поедет.</p>
-                <p><span className="text-mint">Зелёная</span> — идеальная учебная траектория.</p>
-                <p>Прозрачные машины — будущие положения корпуса.</p>
-              </div>
-            </Card>
-
-            <Card className="p-4">
-              <FinishAttemptButton level={level} />
-              <p className="mt-3 text-xs leading-5 text-soft">Когда Вика остановилась и хочет понять результат — можно завершить попытку вручную.</p>
-            </Card>
-          </div>
+          <GameControlDock level={level} />
+          <GameMotivation />
         </div>
-
-        <Card className="p-4">
-          <TouchControls />
-          <div className="hidden text-sm text-soft md:block">
-            Управление: W/↑ — газ, S/↓ — тормоз, A/D — руль, Q — R, E — D, R — сброс. Для спокойной тренировки включён режим замедления.
-          </div>
-        </Card>
-      </div>
-    </AppShell>
+      </AuthGuard>
+    </main>
   )
 }

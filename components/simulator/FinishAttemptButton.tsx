@@ -5,7 +5,7 @@ import { saveAttempt } from '@/lib/progress/storage'
 import type { ParkingLevel } from '@/lib/data/levels'
 import { useSimulatorStore } from '@/store/simulatorStore'
 
-export function FinishAttemptButton({ level }: { level: ParkingLevel }) {
+export function FinishAttemptButton({ level, compact = false }: { level: ParkingLevel; compact?: boolean }) {
   const finish = () => {
     const state = useSimulatorStore.getState()
     const result = buildAttemptResult({
@@ -25,9 +25,13 @@ export function FinishAttemptButton({ level }: { level: ParkingLevel }) {
   return (
     <button
       onClick={finish}
-      className="w-full rounded-2xl bg-gradient-to-r from-pink to-violet px-4 py-3 text-sm font-semibold shadow-glow active:scale-[.98]"
+      className={compact
+        ? "game-chip flex items-center justify-center gap-2 rounded-2xl px-3 py-3 text-sm font-semibold text-pink active:scale-[.98]"
+        : "w-full rounded-2xl bg-gradient-to-r from-pink to-violet px-4 py-3 text-sm font-semibold shadow-glow active:scale-[.98]"
+      }
     >
-      Завершить попытку и посмотреть разбор
+      <span>{compact ? '⚑' : ''}</span>
+      {compact ? 'Завершить' : 'Завершить попытку и посмотреть разбор'}
     </button>
   )
 }
