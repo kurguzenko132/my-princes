@@ -1,25 +1,4 @@
+import type { Metadata } from 'next'
 import './globals.css'
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin', 'cyrillic'] })
-
-export const metadata: Metadata = {
-  title: 'Vika Parking',
-  description: 'Личный тренажёр парковки для Вики'
-}
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: '#080A12'
-}
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="ru">
-      <body className={inter.className}>{children}</body>
-    </html>
-  )
-}
+export const metadata: Metadata = { title: '100 комплиментов для Вики', description: 'Маленькое приложение с комплиментами для Вики' }
+export default function RootLayout({ children }: { children: React.ReactNode }) { return <html lang="ru"><body>{children}</body></html> }

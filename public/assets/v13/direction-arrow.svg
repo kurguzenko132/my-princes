@@ -1,6 +1,0 @@
-<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
-  <filter id="g"><feGaussianBlur stdDeviation="5"/></filter>
-  <path d="M34 92 C68 52 104 48 136 70" stroke="#3EA6FF" stroke-width="14" stroke-linecap="round" fill="none" opacity=".28" filter="url(#g)"/>
-  <path d="M34 92 C68 52 104 48 136 70" stroke="#3EA6FF" stroke-width="7" stroke-linecap="round" fill="none"/>
-  <path d="M131 42 L153 78 L112 83 Z" fill="#3EA6FF"/>
-</svg>

@@ -1,8 +1,0 @@
-<svg width="120" height="160" viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg">
-  <filter id="s"><feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#000" flood-opacity=".45"/></filter>
-  <g filter="url(#s)">
-    <rect x="52" y="88" width="16" height="62" rx="6" fill="#111827"/>
-    <rect x="22" y="14" width="76" height="76" rx="18" fill="#0B2A55" stroke="#58B8FF" stroke-width="5"/>
-    <text x="60" y="68" text-anchor="middle" font-family="Arial" font-size="54" font-weight="700" fill="#CFEAFF">P</text>
-  </g>
-</svg>
