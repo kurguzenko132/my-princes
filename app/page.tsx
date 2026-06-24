@@ -16,10 +16,9 @@ export default function HomePage() {
   const [opened, setOpened] = useState<number[]>([])
   const [envelopeOpen, setEnvelopeOpen] = useState(false)
 
-  const isEnvelope = index === compliments.length - 1
+  const isFinal = index === compliments.length - 1
   const compliment = compliments[index]
   const progress = ((index + 1) / compliments.length) * 100
-  const animationClass = `anim${index % 5}`
 
   useEffect(() => {
     const saved = localStorage.getItem('ilya-compliment-index')
@@ -74,33 +73,24 @@ export default function HomePage() {
 
         <section className="center">
           <div className="content">
-            <article key={index} className={`card ${animationClass}`}>
-              {isEnvelope ? (
-                <div className="envelopeStage">
-                  <p className="envelopeTitle">последний сюрприз / 5</p>
+            <article key={index} className="card">
+              {isFinal ? (
+                <div className="finalStage">
+                  <p className="finalTitle">последний сюрприз / 5</p>
 
-                  {envelopeOpen && (
-                    <div className="openedLetter">иди нахуй</div>
+                  {envelopeOpen ? (
+                    <div className="revealCard">
+                      <div className="revealText">иди нахуй</div>
+                    </div>
+                  ) : (
+                    <button className="envelopeButton" onClick={() => setEnvelopeOpen(true)}>
+                      <div className="envelopeEmoji">✉️</div>
+                      <div className="envelopeButtonText">Открыть конверт</div>
+                    </button>
                   )}
 
-                  <div
-                    className={`envelopeShell ${envelopeOpen ? 'open' : ''}`}
-                    onClick={() => setEnvelopeOpen(true)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') setEnvelopeOpen(true)
-                    }}
-                  >
-                    {!envelopeOpen && <div className="paperPeek">Открой</div>}
-                    <div className="envelopeLid" />
-                    <div className="envelopePocket" />
-                    <div className="envelopeFrontLeft" />
-                    <div className="envelopeFrontRight" />
-                  </div>
-
                   <div className="tapHint">
-                    {envelopeOpen ? 'вот теперь всё на месте' : 'нажми на конверт'}
+                    {envelopeOpen ? 'сюрприз открыт' : 'нажми на конверт'}
                   </div>
                 </div>
               ) : (
