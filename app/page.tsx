@@ -79,21 +79,24 @@ export default function HomePage() {
               {isEnvelope ? (
                 <div className="envelopeStage">
                   <p className="kicker">последний комплимент / 5</p>
-                  <div
-                    className={`envelope ${envelopeOpen ? 'open' : ''}`}
-                    onClick={() => setEnvelopeOpen(true)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') setEnvelopeOpen(true)
-                    }}
-                  >
-                    <div className="letter">{envelopeOpen ? 'иди нахуй' : 'Открой'}</div>
-                    <div className="flap" />
-                    <div className="envelopeBody" />
+                  <div className="envelopeScene">
+                    <div
+                      className={`envelope ${envelopeOpen ? 'open' : ''}`}
+                      onClick={() => setEnvelopeOpen(true)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') setEnvelopeOpen(true)
+                      }}
+                    >
+                      <div className="letter">{envelopeOpen ? 'иди нахуй' : 'Открой'}</div>
+                      <div className="envelopeBack" />
+                      <div className="flap" />
+                      <div className="envelopeFront" />
+                    </div>
                   </div>
                   <div className="tapHint">
-                    {envelopeOpen ? 'ну вот, сюрприз открыт' : 'нажми на конверт'}
+                    {envelopeOpen ? 'ну вот, теперь видно нормально' : 'нажми на конверт'}
                   </div>
                 </div>
               ) : (

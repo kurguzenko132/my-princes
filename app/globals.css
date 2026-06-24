@@ -375,35 +375,81 @@ button {
 }
 
 
-
 .envelopeStage {
   position: relative;
   z-index: 2;
+  width: 100%;
   display: grid;
   justify-items: center;
-  gap: 22px;
+  gap: 18px;
+  padding-top: 10px;
+}
+
+.envelopeScene {
+  position: relative;
+  width: min(330px, 78vw);
+  height: 320px;
+  display: grid;
+  place-items: end center;
 }
 
 .envelope {
-  position: relative;
-  width: min(360px, 78vw);
-  height: 230px;
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  width: min(330px, 78vw);
+  height: 210px;
   cursor: pointer;
+  transform: translateX(-50%);
   filter: drop-shadow(0 28px 48px rgba(0,0,0,.45));
-  transform-style: preserve-3d;
 }
 
-.envelopeBody {
+.letter {
   position: absolute;
-  inset: 62px 0 0;
+  left: 50%;
+  bottom: 98px;
+  width: min(286px, 66vw);
+  min-height: 130px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: linear-gradient(180deg, #ffffff, #f4f0ff);
+  color: #10111a;
+  font-size: clamp(30px, 6vw, 50px);
+  font-weight: 900;
+  letter-spacing: -.055em;
+  text-align: center;
+  transform: translateX(-50%) translateY(82px);
+  opacity: 0;
+  transition:
+    transform .72s cubic-bezier(.22,1,.36,1),
+    opacity .28s ease;
+  z-index: 2;
+  box-shadow: 0 18px 50px rgba(0,0,0,.24);
+}
+
+.envelope.open .letter {
+  transform: translateX(-50%) translateY(-112px);
+  opacity: 1;
+  z-index: 7;
+}
+
+.envelopeBack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 150px;
   border-radius: 0 0 28px 28px;
-  background: linear-gradient(145deg, #F7D6E8, #D7C2FF 55%, #AFE8FF);
+  background: linear-gradient(145deg, #f7d6e8, #d7c2ff 55%, #afe8ff);
   border: 1px solid rgba(255,255,255,.58);
   overflow: hidden;
+  z-index: 3;
 }
 
-.envelopeBody::before,
-.envelopeBody::after {
+.envelopeBack::before,
+.envelopeBack::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -412,59 +458,93 @@ button {
   background: rgba(255,255,255,.22);
 }
 
-.envelopeBody::before {
+.envelopeBack::before {
   left: 0;
   clip-path: polygon(0 0, 100% 50%, 0 100%);
 }
 
-.envelopeBody::after {
+.envelopeBack::after {
   right: 0;
   clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+.envelopeFront {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 150px;
+  border-radius: 0 0 28px 28px;
+  overflow: hidden;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.envelopeFront::before,
+.envelopeFront::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,.05));
+}
+
+.envelopeFront::before {
+  left: 0;
+  clip-path: polygon(0 0, 100% 55%, 0 100%);
+}
+
+.envelopeFront::after {
+  right: 0;
+  clip-path: polygon(100% 0, 0 55%, 100% 100%);
 }
 
 .flap {
   position: absolute;
   left: 0;
   right: 0;
-  top: 62px;
+  bottom: 148px;
   height: 120px;
-  background: linear-gradient(145deg, #FFB8D8, #B99AFF);
-  clip-path: polygon(0 0, 50% 88%, 100% 0);
-  transform-origin: top center;
-  transition: transform .75s cubic-bezier(.22,1,.36,1);
-  z-index: 4;
-}
-
-.letter {
-  position: absolute;
-  left: 24px;
-  right: 24px;
-  top: 72px;
-  min-height: 132px;
-  border-radius: 20px;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: #fff;
-  color: #111;
-  font-size: clamp(32px, 7vw, 58px);
-  font-weight: 850;
-  letter-spacing: -.05em;
-  transform: translateY(28px);
-  transition: transform .75s cubic-bezier(.22,1,.36,1);
-  z-index: 2;
-  text-align: center;
+  background: linear-gradient(145deg, #ffb8d8, #b99aff);
+  clip-path: polygon(0 0, 50% 90%, 100% 0);
+  transform-origin: 50% 0%;
+  transition:
+    transform .72s cubic-bezier(.22,1,.36,1),
+    opacity .28s ease;
+  z-index: 8;
+  pointer-events: none;
 }
 
 .envelope.open .flap {
   transform: rotateX(180deg);
-}
-
-.envelope.open .letter {
-  transform: translateY(-96px);
+  opacity: .28;
+  z-index: 1;
 }
 
 .tapHint {
   color: #BDC4DA;
   font-size: 15px;
+  margin-top: -6px;
+}
+
+@media (max-width: 720px) {
+  .envelopeScene {
+    height: 300px;
+  }
+
+  .envelope {
+    width: min(300px, 82vw);
+    height: 198px;
+  }
+
+  .letter {
+    width: min(256px, 70vw);
+    min-height: 122px;
+    font-size: clamp(30px, 8vw, 44px);
+  }
+
+  .envelope.open .letter {
+    transform: translateX(-50%) translateY(-102px);
+  }
 }
